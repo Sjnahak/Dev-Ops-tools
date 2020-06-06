@@ -30,11 +30,18 @@ https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver
 Pre-requisite:
 Get a load balancer or VIP to manage and configure kubernetes Masters, use cloud load balancer or HAproxy or nginx
 All master servers entry should be made in load balancer on port number 6443.
+```
+1. Disable swap
+2. Disable selinux
+3. Install docker kubeadm kubectl kubelet
+```
 
 Step 1: Login into master01 Create kubeadm config File 
+```
 mkdir -p /etc/kubernetes/kubeadm
-
+```
 Step 2: configure config file
+```
 [root@suraj ~] vim /etc/kubernetes/kubeadm/kubeadm-config.yaml
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
@@ -47,9 +54,10 @@ networking:
 #apiServer:
 #  extraArgs:
 #    apiserver-count: "3"
+```
 
-Setp3 : Apply kubeadm init using the config file (--upload-certs flag is used to upload the certificates that should be shared across all the control-plane instances to the cluster)
-
+Step 3 : Apply kubeadm init using the config file (--upload-certs flag is used to upload the certificates that should be shared across all the control-plane instances to the cluster)
+```
 [root@suraj ~]# kubeadm init --config=/etc/kubernetes/kubeadm/kubeadm-config.yaml --upload-certs
 Output:
 Your Kubernetes control-plane has initialized successfully!
@@ -78,14 +86,16 @@ Then you can join any number of worker nodes by running the following on each as
 
 kubeadm join loadbalancerip:6443 --token token \
     --discovery-token-ca-cert-hash sha256:abcdefghizlalamalamlamwwm
-	
+```
+
 Step 4: Create .kube dir and copy admin.conf file
+```
 [root@suraj ~] mkdir -p $HOME/.kube
 [root@suraj ~] sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 [root@suraj ~] sudo chown $(id -u):$(id -g) $HOME/.kube/config
-
+```
 Step 5 : Join Other control-plane components i.e Master02 or master 03
-
+```
 Login to Master02:
 [root@suraj ~] kubeadm join loadbalancerip:6443 --token xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
 >     --discovery-token-ca-cert-hash sha256:yyyyyyyyyyyyyyyyyyyyyyyy \
@@ -95,15 +105,19 @@ Login to Master03:
 [root@suraj ~] kubeadm join loadbalancerip:6443 --token xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
 >     --discovery-token-ca-cert-hash sha256:yyyyyyyyyyyyyyyyyyyyyyyy \
 >     --control-plane --certificate-key xyzyzyzyzyzyzyzyzyzyz
+```
 
 Step 6: Verify the master nodes added by login into master01
+```
 [root@suraj ~]# kubectl get nodes
 NAME                         STATUS     ROLES    AGE     VERSION
 master01  NotReady   master   9m24s   v1.18.0
 master02  NotReady   master   96s     v1.18.0
 master03  NotReady   master   90s     v1.18.0
+```
 
 Step 7: Apply flannel Network
+```
 [root@suraj ~]# kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 podsecuritypolicy.policy/psp.flannel.unprivileged created
 clusterrole.rbac.authorization.k8s.io/flannel created
@@ -115,23 +129,24 @@ daemonset.apps/kube-flannel-ds-arm64 created
 daemonset.apps/kube-flannel-ds-arm created
 daemonset.apps/kube-flannel-ds-ppc64le created
 daemonset.apps/kube-flannel-ds-s390x created
-
+```
 Step 8: Check Nodes if they are ready
+```
 [root@suraj ~]# kubectl get nodes
 NAME                         STATUS   ROLES    AGE    VERSION
 master01  Ready    master   12m    v1.18.0
 master02  Ready    master   5m9s   v1.18.0
 master03  Ready    master   5m3s   v1.18.0
-
+```
 Step 9: Check all control-plane pods (YOU will See 3 etcd,kubeapiserver,kube-scheduler etc..)
+```
 [root@suraj ~]# kubectl get pods -n kube-system
-
-
+```
 10. Join Worker nodes 
-
+```
 Login to Worker01 and run :
 
 kubeadm join loadbalancerip:6443 --token token \
     --discovery-token-ca-cert-hash sha256:abcdefghizlalamalamlamwwm
-
+```
 
