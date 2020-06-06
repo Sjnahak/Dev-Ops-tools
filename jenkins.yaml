@@ -1,0 +1,91 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins
+  labels:
+    app1: jenkins-master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app1: jenkins-master
+  template:
+    metadata:
+      labels:
+        app1: jenkins-master
+    spec:
+      containers:
+        - name: jenkins
+          image: pritishr00/hypo1-jenkin
+          env:
+            - name: JAVA_OPTS
+              value: -Djenkins.install.runSetupWizard=false
+          ports:
+            - name: http-port
+              containerPort: 8080
+            - name: jnlp-port
+              containerPort: 50000
+          volumeMounts:
+            - name: jenkins-home
+              mountPath: /var/jenkins_home
+      volumes:
+        - name: jenkins-home
+          emptyDir: {}
+
+		  
+---		  
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app1: jenkins-master
+  name: jenkins-deploy
+spec:
+  ports:
+  - name: "http"
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  - name: "jnlp"
+    port: 50000
+    protocol: TCP
+    targetPort: 50000
+  selector:
+    app1: jenkins-master
+  type: NodePort
+status:
+  loadBalancer: {}
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jenkins-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 500Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data/"
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jenkins-pv-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+
+
+
