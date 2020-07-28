@@ -419,13 +419,13 @@ metadata:
     kompose.version: 1.21.0 (992df58d8)
   creationTimestamp: null
   labels:
-    io.kompose.service: ldap
-  name: ldap
+    io.kompose.service: gerrit
+  name: gerrit
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: ldap
+      io.kompose.service: gerrit
   strategy:
     type: Recreate
   template:
@@ -435,34 +435,54 @@ spec:
         kompose.version: 1.21.0 (992df58d8)
       creationTimestamp: null
       labels:
-        io.kompose.service: ldap
+        io.kompose.service: gerrit
     spec:
+      securityContext:
+       runAsUser: 1000
+       fsGroup: 0
+       runAsNonRoot: true
       containers:
       - env:
-        - name: LDAP_ADMIN_PASSWORD
-          value: secret
-        image: osixia/openldap
+        - name: CANONICAL_WEB_URL
+          value: http://localhost
+        image: gerritcodereview/gerrit
         imagePullPolicy: ""
-        name: ldap
+        name: gerrit
         ports:
-        - containerPort: 389
-        - containerPort: 636
+        - containerPort: 29418
+        - containerPort: 8080
         resources: {}
         volumeMounts:
-        - mountPath: /var/lib/ldap
-          name: ldap-hostpath0
-        - mountPath: /etc/ldap/slapd.d
-          name: ldap-hostpath1
+        - mountPath: /var/gerrit/etc
+          name: gerrit-hostpath0
+        - mountPath: /var/gerrit/git
+          name: gerrit-hostpath1
+        - mountPath: /var/gerrit/db
+          name: gerrit-hostpath2
+        - mountPath: /var/gerrit/index
+          name: gerrit-hostpath3
+        - mountPath: /var/gerrit/cache
+          name: gerrit-hostpath4
       restartPolicy: Always
       serviceAccountName: ""
       volumes:
       - hostPath:
-          path: /external/gerrit/ldap/var
-        name: ldap-hostpath0
+          path: /external/gerrit/etc
+        name: gerrit-hostpath0
       - hostPath:
-          path: /external/gerrit/ldap/etc
-        name: ldap-hostpath1
+          path: /external/gerrit/git
+        name: gerrit-hostpath1
+      - hostPath:
+          path: /external/gerrit/db
+        name: gerrit-hostpath2
+      - hostPath:
+          path: /external/gerrit/index
+        name: gerrit-hostpath3
+      - hostPath:
+          path: /external/gerrit/cache
+        name: gerrit-hostpath4
 status: {}
+
 		  
     b. deploy the manifest
     kubectl create -f gerrit.yaml
@@ -473,20 +493,27 @@ status: {}
 #### 3. create a Service to expose the gerrit container and make it accessible from the public
     a. cat > gerrit-service.yaml
 
-    apiVersion: v1
-    kind: Service
-    metadata:
-      name: gerrit
-      labels:
-        app: gerrit
-    spec:
-      type: LoadBalancer
-      ports:
-        - port: <your-port-number>
-          targetPort: 8080
-          protocol: TCP
-      selector:
-        app: gerrit
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --volumes hostPath
+    kompose.version: 1.21.0 (992df58d8)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: gerrit
+  name: gerrit
+spec:
+  type: NodePort
+  ports:
+  - name: "29418"
+    port: 29418
+    targetPort: 29418
+  - name: "80"
+    port: 80
+    targetPort: 8080
+  selector:
+    io.kompose.service: gerrit
 
     b. deploy the manifest and launch the service
     kubectl create -f gerrit-service.yaml
