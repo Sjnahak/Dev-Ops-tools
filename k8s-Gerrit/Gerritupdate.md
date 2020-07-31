@@ -39,7 +39,7 @@ This project details steps used to set up gerrit deployment using kubernetes.
 #### 3. create an ldap Deployment
     a. create a manifest for the deployment
     cat > ldap.yaml
-
+```
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -98,10 +98,10 @@ status: {}
 
     c. check its health, it might take a couple of minutes
     kubectl get pod -l app=ldap
-
+```
 #### 4. create a Service to expose the ldap container and make it accessible from the ldap-admin container
     a. cat > ldap-service.yaml
-
+```
 apiVersion: v1
 kind: Service
 metadata:
@@ -124,7 +124,7 @@ spec:
     io.kompose.service: ldap
 status:
   loadBalancer: {}
-
+```
     b. deploy the manifest and launch the service
     kubectl create -f ldap-service.yaml
 
@@ -141,7 +141,7 @@ status:
 #### 1. create an ldap-admin Deployment
     a. create a manifest for the deployment
     cat > ldap-admin.yaml
-
+```
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -181,7 +181,7 @@ spec:
       serviceAccountName: ""
       volumes: null
 status: {}
-		  
+```		  
     b. deploy the manifest
     kubectl create -f ldap-admin.yaml
 
@@ -190,7 +190,7 @@ status: {}
 
 #### 4. create a Service to expose the ldap-admin container and make it accessible from the public
     a. cat > ldap-admin-service.yaml
-
+```
 apiVersion: v1
 kind: Service
 metadata:
@@ -210,7 +210,7 @@ spec:
     io.kompose.service: ldap-admin
 status:
   loadBalancer: {}
-
+```
     b. deploy the manifest and launch the service
     kubectl create -f ldap-admin-service.yaml
 
@@ -245,6 +245,7 @@ status:
 
 ## Gerrit-config
 1. Create Directory mkdir /external/gerrit/etc/gerrit.config
+```
 [gerrit]
         basePath = git
         serverId = be5b6b2d-c164-4935-b39c-3454ce24b26a
@@ -278,6 +279,7 @@ status:
         listenUrl = http://*:8080/
 [cache]
         directory = cache
+```
 
 ## MYSQL  Note : Have to update with statefulsets
 #### 1. create a PersistentVolumeClaim using persistent disks
@@ -410,7 +412,7 @@ status:
 #### 2. create a gerrit Deployment
     a. create a manifest for the deployment
     cat > gerrit.yaml
-
+```
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -482,7 +484,7 @@ spec:
           path: /external/gerrit/cache
         name: gerrit-hostpath4
 status: {}
-
+```
 		  
     b. deploy the manifest
     kubectl create -f gerrit.yaml
@@ -492,7 +494,7 @@ status: {}
 
 #### 3. create a Service to expose the gerrit container and make it accessible from the public
     a. cat > gerrit-service.yaml
-
+```
 apiVersion: v1
 kind: Service
 metadata:
@@ -514,7 +516,7 @@ spec:
     targetPort: 8080
   selector:
     io.kompose.service: gerrit
-
+```
     b. deploy the manifest and launch the service
     kubectl create -f gerrit-service.yaml
 
