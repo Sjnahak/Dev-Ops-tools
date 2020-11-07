@@ -24,3 +24,4 @@ service iptables save
 kubectl taint nodes --all node-role.kubernetes.io/master-
 kubectl create clusterrolebinding permissive-binding --clusterrole=cluster-admin --user=admin --user=kubelet --group=system:serviceaccounts
 https://github.com/jenkinsci/kubernetes-plugin/blob/master/src/main/kubernetes/service-account.yml
+https://www.alibabacloud.com/blog/kubernetes-demystified-solving-service-dependencies_594110 --pod dependecncy
