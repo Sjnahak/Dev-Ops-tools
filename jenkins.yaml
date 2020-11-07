@@ -58,6 +58,7 @@ spec:
 status:
   loadBalancer: {}
 
+#IF USED PersistentVolume IN Jenkins Deployment File
 ---
 apiVersion: v1
 kind: PersistentVolume
