@@ -17,14 +17,14 @@ spec:
     spec:
       volumes:
       - name: task-pv-storage
-	  persistentVolumeClaim:
+        persistentVolumeClaim:
           claimName: task-pv-claim
       containers:
       - name: nginx-container
         image: nginx
         ports:
         - containerPort: 80
-	    name: "http-server"
+          name: "http-server"
 	    volumeMounts:
-        - mountPath: "/usr/share/nginx/html"
-          name: task-pv-storage
+          - mountPath: "/usr/share/nginx/html"
+            name: task-pv-storage
