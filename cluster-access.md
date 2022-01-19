@@ -109,3 +109,28 @@ To get the token : kubectl describe sa admin-user -n kubernetes-dashboard
 To describe the token : kubectl describe secret admin-user-token-fmnlz -n kubernetes-dashboard
 kubectl describe sa viewonly -n kubernetes-dashboard
 ```
+
+
+# Provide Access to EKS Cluster
+```
+Get the current user configured locally:
+aws sts get-caller-identity
+
+
+To give admin access to eks cluster:
+kubectl	edit -n kube-system config-map/aws-auth
+
+under mapUser section : add 
+ - userarn: 
+   username: 
+   groups: 
+    - system:masters
+
+To Give granular access use Role and rolebinding with aws-auth file:
+
+under mapUser section : add 
+ - userarn: 
+   username: 
+   groups: 
+    - role-you-created
+```
