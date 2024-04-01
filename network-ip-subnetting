@@ -1,0 +1,98 @@
+IP addr-subnetting
+
+Decimal (base 10)  : 3        2      9      4 
+                     3* 1000  2*100  9*10   4*1
+
+
+Hexa Decimal (base16) :  C              D           E
+                         c * 256        d * 16      e * 1
+                         3072 (c=12)    208 (D=13)  14 (E=14)  = 3294
+
+Binary : 192.168.1.254
+
+11000000 . 10101000 .00000001 . 11111110
+
+Decimal to binary : 221
+
+Starting from left subtract the given number example : 221 -128 [add 1 as binary in that place]
+
+11011100
+
+what is /24 : it means first 24 bits are network bits and rest are host bits
+
+IPv4 address Classes:
+Class    First Octet   First Octet numric range
+A        0xxxxxxx       0-127 [limited to 126 because of loop back]
+B        10xxxxxx       128-191
+C        110xxxxx       192-223
+D        1110xxxx       224-239
+E        1111xxxx       240-255
+
+Loop Back address : 127.0.0.0 - 127.255.255.255
+
+
+Class    First Octet   First Octet numric range  prefix-length
+A        0xxxxxxx       0-127                     /8
+B        10xxxxxx       128-191                   /16
+C        110xxxxx       192-223                   /24
+
+Netmask :
+Class A : /8    255.0.0.0
+Class B : /16   255.255.0.0
+class C : /24   255.255.255.0.0
+
+HOST Portion of the address is all 0;s = Network address
+
+HOST Portion of the address is all 1;s = broadcast address
+
+Network and broadcast address cannot be assigned to a host
+
+192.168.1.0/24
+ntwk addr: 192.168.1.0
+max Usable ip addr : 2^n - 2 = 254 [n=number of host bits]
+first usable ip: add 1 to host bit[00000000] -->[00000001] =192.168.1.1/24
+last usable ip : subtract 1 from the broadcast bit [11111111] [11111110]= 192.168.1.254/24
+broadcast : 192.168.1.255
+
+172.16.0.0/16
+
+Subnetting : 
+==> How many usabe address are there in each network: 2^n -2
+> 203.0.113.0/25 = 2^7 -2 = 126
+> 203.0.113.0/26 = 62
+> 203.0.113.0/27 = 30
+> 203.0.113.0/28 = 14
+> 203.0.113.0/29 = 6
+> 203.0.113.0/30 = 2
+> 203.0.113.0/31 = 0 [for point to point ntwk we can use /31 exaample connecting 2 router]
+> 203.0.113.0/32 = static ip to specify the excat host
+
+Make 4 subnet of equal size from : 192.168.1.0/24 to accomadate 45 hosts in each subnet
+
+2^6 -2 = 62 address which makes /26 this will accomadate the required number of host
+
+1st subnet --> 192.168.1.63/26 [Hint Find the broadcast address of subnet 1. The next address is the network addres of subnet 2. repeat for next subnet]
+11000000.10101000.00000001.00 [000000] ---> 11000000.10101000.00000001.00 [111111] = 192.168.1.63 (broadcast addr for subnet1)
+
+Next Hint is is to add 64 as /26 provides 64 host ip
+2nd subnet --> 192.168.1.64/26 
+3rd subnet --> 192.168.1.128/26 
+4th subnet --> 192.168.1.192/26 
+
+number of subnet = 2^x where x is number of borrowed bits
+
+===> what subnet does host 192.169.5.57/27 be;ong to ?
+                |
+                V
+                convert into binary
+11000000 . 10101000 . 00000101 . 001 11001
+                |
+                V   convert host bits to zeros
+11000000 . 10101000 . 00000101 . 001 00000
+192.168.5.32
+
+VLSM: vaiable length subnet mask
+steps:
+1. Assign the largest subnet at start of address space
+2. Assign the second largest subnett after it
+3. repeat the process untill all subnets have been assigned
