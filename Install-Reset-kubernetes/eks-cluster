@@ -1,0 +1,18 @@
+1. Install Kubectl
+https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
+
+2. IAM Role with AmazonEKSClusterPolicy to create eks cluster
+
+3. install update aws cli 
+https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+
+4. Install or update eksctl 
+https://eksctl.io/installation/
+
+5. Create eks cluster https://docs.aws.amazon.com/eks/latest/userguide/create-cluster.html
+
+6. aws eks update-kubeconfig --region region-code --name my-cluster [to update profile in your cluster]
+
+7. For creating worker node it should have  an iam role having "Amazoneksworkernodeploicy" and amazonec2conatinerregistryreadonlypolicy
+
+Still updating
